@@ -1,0 +1,14 @@
+[project]
+name = "cityuge2260calculator"
+version = "0.1.0"
+description = "基于事件溯源架构的订单驱动回测系统，专为香港股票市场设计的T+N交易模拟器"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "backtrader>=1.9.78.123",
+    "yfinance>=1.1.0",
+    "pandas>=2.3.3",
+    "openpyxl>=3.1.5",
+    "matplotlib",
+    "sqlalchemy>=2.0.46",
+]
