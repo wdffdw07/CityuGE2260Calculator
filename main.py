@@ -357,9 +357,10 @@ class TradingEngine:
         strategy = self.results[0]
         dates = strategy.daily_dates
         values = strategy.daily_values
+        stock_values = strategy.stock_values  # 获取每个股票的价值变化
         
         if dates and values:
-            self.plotter.plot_portfolio_evolution(dates, values, INITIAL_CASH, portfolio_name)
+            self.plotter.plot_portfolio_evolution(dates, values, INITIAL_CASH, portfolio_name, stock_values)
     
     def view_portfolios(self):
         """查看现有组合"""

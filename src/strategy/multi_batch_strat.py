@@ -26,6 +26,9 @@ class MultiBatchOrderStrategy(bt.Strategy):
         self.daily_dates = []  # 日期列表
         self.executed_count = 0  # 已执行订单数
         
+        # 每个股票的每日持仓价值
+        self.stock_values = defaultdict(list)  # ticker -> [values]
+        
         # 按执行日期分组订单
         self.orders_by_date = defaultdict(list)
         for order in self.params.history_orders:
@@ -106,6 +109,16 @@ class MultiBatchOrderStrategy(bt.Strategy):
         # 记录每日账户价值
         self.daily_dates.append(current_date)
         self.daily_values.append(self.broker.getvalue())
+        
+        # 记录每个股票的每日持仓价值
+        for data in self.datas:
+            ticker = data._name
+            position = self.getposition(data)
+            if position.size > 0:
+                stock_value = position.size * data.close[0]
+            else:
+                stock_value = 0.0
+            self.stock_values[ticker].append(stock_value)
         
         # 检查是否有订单要在今天执行
         if current_date in self.orders_by_date:
