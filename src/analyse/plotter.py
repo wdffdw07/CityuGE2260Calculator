@@ -39,6 +39,32 @@ class PortfolioPlotter:
             print("✗ 无数据可绘制")
             return
         
+        # 找到第一个有持仓的索引（账户价值开始变化或有股票持仓）
+        start_idx = 0
+        if stock_values:
+            # 找到任意股票第一次有持仓的位置
+            for ticker, stock_vals in stock_values.items():
+                for i, val in enumerate(stock_vals):
+                    if val > 0:
+                        start_idx = i
+                        break
+                if start_idx > 0:
+                    break
+        
+        # 如果没找到持仓，看账户价值是否有变化
+        if start_idx == 0:
+            for i, val in enumerate(values):
+                if abs(val - initial_cash) > 1:  # 账户价值有变化
+                    start_idx = i
+                    break
+        
+        # 裁剪数据从第一笔交易开始
+        if start_idx > 0:
+            dates = dates[start_idx:]
+            values = values[start_idx:]
+            if stock_values:
+                stock_values = {ticker: vals[start_idx:] for ticker, vals in stock_values.items()}
+        
         # 计算统计数据
         total_return = ((values[-1] - initial_cash) / initial_cash) * 100
         max_value = max(values)
@@ -78,6 +104,8 @@ class PortfolioPlotter:
         
         # === 图1: 账户总价值曲线 ===
         ax1.plot(dates, values, linewidth=2.5, color='#2E86AB', marker='o', markersize=4, label='账户总价值', zorder=3)
+        
+        # 使用初始资金作为基准线（投资起点）
         ax1.axhline(y=initial_cash, color='gray', linestyle='--', alpha=0.5, label='初始资金', linewidth=1.5)
         ax1.fill_between(dates, initial_cash, values, alpha=0.15, color='#2E86AB')
         

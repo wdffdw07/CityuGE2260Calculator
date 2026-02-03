@@ -32,6 +32,9 @@ history/
 *.sqlite
 *.sqlite3
 
+# Order files (not universal)
+order/
+
 # IDE
 .vscode/
 .idea/

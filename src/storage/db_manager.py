@@ -126,7 +126,8 @@ class DatabaseManager:
         获取组合摘要信息
         
         Returns:
-            {'total_orders': xxx, 'first_date': xxx, 'last_date': xxx, 'tickers': [], 'first_execution_date': xxx}
+            {'total_orders': xxx, 'first_date': xxx, 'last_date': xxx, 'tickers': [], 
+             'first_execution_date': xxx, 'last_execution_date': xxx}
         """
         session = self.Session()
         try:
@@ -139,15 +140,17 @@ class DatabaseManager:
             
             tickers = list(set([o.ticker for o in orders]))
             
-            # 获取最早的执行日期
+            # 获取最早和最晚的执行日期
             execution_dates = [o.execution_date for o in orders]
             first_execution_date = min(execution_dates)
+            last_execution_date = max(execution_dates)
             
             return {
                 'total_orders': len(orders),
                 'first_date': orders[0].order_date,
                 'last_date': orders[-1].order_date,
                 'first_execution_date': first_execution_date,  # 第一个执行日期
+                'last_execution_date': last_execution_date,    # 最后执行日期
                 'tickers': tickers,
                 'order_dates': list(set([o.order_date for o in orders]))
             }

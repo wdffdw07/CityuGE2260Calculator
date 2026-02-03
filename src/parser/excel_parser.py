@@ -158,9 +158,30 @@ class ExcelParser:
         
         return orders, execution_date
     
+    def find_order_files(self, order_folder: Path) -> List[Path]:
+        """
+        在订单文件夹中查找所有订单文件
+        
+        Args:
+            order_folder: 订单文件夹路径（如 order/20260125）
+        
+        Returns:
+            订单文件路径列表
+        """
+        # 查找所有xlsx和csv文件
+        xlsx_files = list(order_folder.glob('*.xlsx'))
+        csv_files = list(order_folder.glob('*.csv'))
+        
+        all_files = xlsx_files + csv_files
+        
+        if not all_files:
+            raise FileNotFoundError(f"在 {order_folder} 中找不到订单文件")
+        
+        return sorted(all_files)  # 按文件名排序
+    
     def find_order_file(self, order_folder: Path) -> Path:
         """
-        在订单文件夹中查找订单文件
+        在订单文件夹中查找订单文件（兼容旧版本，返回第一个文件）
         
         Args:
             order_folder: 订单文件夹路径（如 order/20260125）
@@ -168,29 +189,6 @@ class ExcelParser:
         Returns:
             订单文件路径
         """
-        # 支持的文件名
-        candidates = [
-            'Trade Order Form.xlsx',
-            'Trade_Order_Form.xlsx',
-            'Trade Order.xlsx',
-            'order.xlsx',
-            'Trade Order Form.csv',
-            'Trade_Order_Form.csv',
-            'order.csv'
-        ]
-        
-        for filename in candidates:
-            file_path = order_folder / filename
-            if file_path.exists():
-                return file_path
-        
-        # 如果找不到，尝试查找任何xlsx或csv文件
-        xlsx_files = list(order_folder.glob('*.xlsx'))
-        csv_files = list(order_folder.glob('*.csv'))
-        
-        if xlsx_files:
-            return xlsx_files[0]
-        elif csv_files:
-            return csv_files[0]
-        else:
-            raise FileNotFoundError(f"在 {order_folder} 中找不到订单文件")
+        files = self.find_order_files(order_folder)
+        return files[0]
+
