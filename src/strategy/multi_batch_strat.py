@@ -57,7 +57,7 @@ class MultiBatchOrderStrategy(bt.Strategy):
             print(f"\n📋 策略初始化:")
             print(f"  - 总订单数: {len(self.params.history_orders)}")
             print(f"  - 执行批次: {len(self.orders_by_date)} 天")
-            print(f"  - Cheat-On-Open: 订单将在目标日前1天挂单，目标日开盘成交")
+            print(f"  - 订单执行模式: 提前1天挂单，在执行日开盘价成交")
             print(f"  - 数据源: {len(self.data_map)} 个股票")
             
             # 显示执行计划
@@ -218,8 +218,8 @@ class MultiBatchOrderStrategy(bt.Strategy):
         
         # 执行买入
         if action.lower() == 'buy':
-            target_price = data.open[0]  # Cheat-On-Open: 使用开盘价
-            self.log(f"→ 挂单买入: {ticker} x {quantity:.0f} @ ${target_price:.4f}")
+            # 使用市价单，配合broker.set_coo(True)，将在下一个交易日开盘价成交
+            self.log(f"→ 挂单买入: {ticker} x {quantity:.0f} (将在次日开盘价成交)")
             self.buy(data=data, size=quantity, exectype=bt.Order.Market)
         
         # 执行卖出
@@ -232,8 +232,7 @@ class MultiBatchOrderStrategy(bt.Strategy):
                 self.log(f"⚠ 警告: {ticker} 持仓 {position.size:.0f} 不足，卖出全部")
                 quantity = position.size
             
-            target_price = data.open[0]
-            self.log(f"→ 挂单卖出: {ticker} x {quantity:.0f} @ ${target_price:.4f}")
+            self.log(f"→ 挂单卖出: {ticker} x {quantity:.0f} (将在次日开盘价成交)")
             self.sell(data=data, size=quantity, exectype=bt.Order.Market)
     
     def stop(self):

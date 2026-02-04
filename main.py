@@ -516,8 +516,11 @@ class TradingEngine:
             verbose=True
         )
         
-        # 开启Cheat-On-Open
-        self.cerebro.broker.set_coc(True)
+        # 关闭Cheat-On-Open，改用Cheat-On-Close
+        # COC=False: 订单在当天收盘价成交（更接近真实交易）
+        # COO=True: 订单在次日开盘价成交（前一天挂单，第二天开盘成交）
+        self.cerebro.broker.set_coc(False)  # 关闭Cheat-On-Close
+        self.cerebro.broker.set_coo(True)   # 开启Cheat-On-Open，让前一天挂单在第二天开盘成交
         
         # 运行回测
         print(f"\n🚀 开始回测...")
